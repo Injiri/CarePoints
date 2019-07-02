@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
                 GeometryController.manipulateData(MainActivity.stringBuffer);
                 carepoints = GeometryController.carePointArrayList;
                 for (int i = 0; i < carepoints.size(); i++) {
-                    Log.e(TAG, "doInBackground: " + carepoints.get(20).getName());
+                    Log.e(TAG, "doInBackground: " + carepoints.get(i).getName());
                 }
                 new Thread(new Runnable() {
                     @Override
