@@ -1,4 +1,4 @@
-package com.injiri.healthcarepoints;
+package com.injiri.healthcarepoints.views;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -14,33 +14,31 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.core.app.ActivityCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.material.snackbar.Snackbar;
+import com.injiri.healthcarepoints.BuildConfig;
+import com.injiri.healthcarepoints.R;
+import com.injiri.healthcarepoints.adapters.CarepointAdapter;
+import com.injiri.healthcarepoints.http.HttpRequests;
+import com.injiri.healthcarepoints.json.GeometryController;
+import com.injiri.healthcarepoints.model.Carepoint;
+import com.injiri.healthcarepoints.services.UserlocationService;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -76,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                final String lat = intent.getStringExtra(userlocation_service.USER_LONGITUDE);
-                final String lng = intent.getStringExtra(userlocation_service.USER_LATITUDE);
+                final String lat = intent.getStringExtra(UserlocationService.USER_LONGITUDE);
+                final String lng = intent.getStringExtra(UserlocationService.USER_LATITUDE);
                 if (lat != null && lng != null) {
                     Toast.makeText(getApplicationContext(), "Latitude " + lat + "\n Longitude:" + lng, Toast.LENGTH_LONG).show();
 
@@ -88,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Latitude " + "null" + "\n Longitude:" + lng, Toast.LENGTH_LONG).show();
                 }
             }
-        }, new IntentFilter(userlocation_service.LOCATION_BROADCAST_ACTION));
+        }, new IntentFilter(UserlocationService.LOCATION_BROADCAST_ACTION));
 
         carepointsbtm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,38 +97,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-    }
-
-    public void populateBuffer() {
-        try {
-            /** initializing StringBuilder  */
-            StringBuilder stringBuilder = new StringBuilder()
-                    .append("https://maps.googleapis.com/maps/api/place/search/json?rankby=distance&keyword=hospital&location=")
-                    .append(latitude)
-                    .append(",")
-                    .append(longitude)
-                    .append("&key=AIzaSyC6-gwhsbRMAbtSNhR56y2EBV9S16bZhHE&sensor=false&libraries=places");
-
-            /** searching for url */
-            URL url = new URL(stringBuilder.toString());
-            Log.e(TAG, "onPreExecute: " + url.toString());
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuffer buffer = new StringBuffer();
-
-            String n = "";
-            while ((n = bufferedReader.readLine()) != null) {
-                buffer.append(n);
-            }
-            Log.e("loaded with size of  => ", "Size is " + buffer.length());
-            MainActivity.stringBuffer = buffer;
-            Log.e(TAG, "populateBuffer:  " + MainActivity.stringBuffer.toString());
-        } catch (Exception e) {
-            Log.e(TAG, "onPreExecute excemption" + e);
-
-        }
 
     }
 
@@ -147,22 +113,16 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            populateBuffer();
-            if (MainActivity.stringBuffer != null) {
-                GeometryController.manipulateData(MainActivity.stringBuffer);
-                carepoints = GeometryController.carePointArrayList;
-                for (int i = 0; i < carepoints.size(); i++) {
-                    Log.e(TAG, "doInBackground: " + carepoints.get(i).getName());
+
+            StringBuffer carePointsStringBuffer = HttpRequests.getAllAvailableCarepoints(latitude, longitude);
+
+            if (carePointsStringBuffer != null) {
+
+                carepoints = GeometryController.deserializeCarepointData(carePointsStringBuffer);
+
+                for (Carepoint carepoint : carepoints) {
+                    Log.e(TAG, "doInBackground: carepoint" + carepoint);
                 }
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (MainActivity.stringBuffer.length() == 0)
-
-                            GeometryController.manipulateData(MainActivity.stringBuffer);
-
-                    }
-                }).start();
 
             } else {
                 Log.e(TAG, "doInBackground: buffer null");
@@ -176,18 +136,9 @@ public class MainActivity extends AppCompatActivity {
 
             super.onPostExecute(aVoid);
 
-
             carepointsrogressBar.setVisibility(View.INVISIBLE);
             adapter.notifyDataSetChanged();
 
-//            adapter.setOnItemClickListener(new CarepointAdapterToMapFragment() {
-//                @Override
-//                public void onCarepointClick(CarePoint carePoint) {
-//                    if (carepointClickListener != null) {
-//                        carepointClickListener.onCarepointClick(carePoint);
-//                    }
-//                }
-//            });
         }
     }
 
@@ -258,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         if (!userservice_running) {
             Toast.makeText(this, "user service running", Toast.LENGTH_LONG).show();
             //start broadcast sharering
-            Intent intent = new Intent(this, userlocation_service.class);
+            Intent intent = new Intent(this, UserlocationService.class);
             startService(intent);
             userservice_running = true;
         }
@@ -340,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         //stop location service broadcast
-        stopService(new Intent(this, userlocation_service.class));
+        stopService(new Intent(this, UserlocationService.class));
         userservice_running = false;
         super.onDestroy();
     }

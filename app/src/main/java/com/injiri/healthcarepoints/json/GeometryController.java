@@ -1,6 +1,8 @@
-package com.injiri.healthcarepoints;
+package com.injiri.healthcarepoints.json;
 
 import android.util.Log;
+
+import com.injiri.healthcarepoints.model.Carepoint;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -9,34 +11,28 @@ import java.util.ArrayList;
 
 
 public class GeometryController {
-    private static final String TAG = MainActivity.class.getSimpleName();
+
+    private static final String TAG = GeometryController.class.getSimpleName();
+
 
     /**
-     * boolean variable for check loading
-     */
-    public static boolean loading;
-    /**
-     * initializing arrayList to to carry nearBy carepoints
-     */
-    public static ArrayList<Carepoint> carePointArrayList = new ArrayList();
-
-    /**
-     * manipulateData method to manipulate data through from JSON format
+     * deserializeCarepointData method to manipulate data through from JSON format
      *
-     * @param buffer
+     * @param carepointsStringBuffer
      */
-    public static void manipulateData(StringBuffer buffer) {
-        loading = true;
-        try {
-            carePointArrayList.clear();
+    public static ArrayList<Carepoint> deserializeCarepointData(StringBuffer carepointsStringBuffer) {
 
-            JSONObject jsonpObject = new JSONObject(buffer.toString());
-            JSONArray array = jsonpObject.getJSONArray("results");
+        ArrayList<Carepoint> carePointArrayList = new ArrayList();
+
+        try {
+
+            JSONObject jsonpObject = new JSONObject(carepointsStringBuffer.toString());
+            JSONArray jsonArray = jsonpObject.getJSONArray("results");
 
             Carepoint carepoint = new Carepoint();
-            for (int i = 0; i < array.length(); i++) {
+            for (int index = 0; index < jsonArray.length(); index++) {
                 try {
-                    JSONObject jsonObject = array.getJSONObject(i);
+                    JSONObject jsonObject = jsonArray.getJSONObject(index);
 
 
                     if (jsonObject.getString("name") != null) {
@@ -57,17 +53,22 @@ public class GeometryController {
 
 
                 } catch (Exception e) {
-                    Log.e(TAG, "manipulateData: " + e);
+                    Log.e(TAG, "deserializeCarepointData: " + e);
                 }
+
                 carePointArrayList.add(carepoint);
             }
 
+            Log.e(TAG, "deserializeCarepointData: Carepoints Arrays List Data " + carePointArrayList);
+
+            return carePointArrayList;
+
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "manipulateData: " + e);
+            Log.e(TAG, "deserializeCarepointData: " + e);
+
+            return new ArrayList<>();
         }
 
-        Log.d("Array Loaded with size ", "Size of------" + carePointArrayList.size() + "+++++++++++++++++++++++");
-        loading = false;
     }
 }

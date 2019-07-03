@@ -1,4 +1,4 @@
-package com.injiri.healthcarepoints;
+package com.injiri.healthcarepoints.adapters;
 
 
 import android.content.Context;
@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.injiri.healthcarepoints.R;
+import com.injiri.healthcarepoints.model.Carepoint;
 
 import java.util.ArrayList;
 
