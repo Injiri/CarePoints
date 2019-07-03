@@ -1,4 +1,4 @@
-package com.injiri.healthcarepoints;
+package com.injiri.healthcarepoints.services;
 
 import android.Manifest;
 import android.app.PendingIntent;
@@ -24,20 +24,20 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.injiri.healthcarepoints.R;
 
 
-public class userlocation_service extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    public userlocation_service() {
+public class UserlocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+    public UserlocationService() {
     }
 
-    public static String LOCATION_BROADCAST_ACTION = userlocation_service.class.getName() + "locationBroadcast";
+    public static String LOCATION_BROADCAST_ACTION = UserlocationService.class.getName() + "locationBroadcast";
     public static String USER_LATITUDE = "extra_lat";
     public static String USER_LONGITUDE = "extra_lng";
 
-    private static String TAG = userlocation_service.class.getSimpleName();
+    private static String TAG = UserlocationService.class.getSimpleName();
     GoogleApiClient myLocationClient;
     LocationRequest myLocationRequest = new LocationRequest();
 

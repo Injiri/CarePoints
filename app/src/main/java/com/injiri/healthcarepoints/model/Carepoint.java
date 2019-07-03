@@ -1,4 +1,4 @@
-package com.injiri.healthcarepoints;
+package com.injiri.healthcarepoints.model;
 
 import java.util.Arrays;
 
