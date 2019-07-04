@@ -71,11 +71,13 @@ public class MainActivity extends AppCompatActivity {
 //        latitude = 0.2844924;
 //        longitude = 34.7673467;
 
+
+
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                final String lat = intent.getStringExtra(UserlocationService.USER_LONGITUDE);
-                final String lng = intent.getStringExtra(UserlocationService.USER_LATITUDE);
+                final String lat = intent.getStringExtra(UserlocationService.USER_LATITUDE);
+                final String lng = intent.getStringExtra(UserlocationService.USER_LONGITUDE);
                 if (lat != null && lng != null) {
                     Toast.makeText(getApplicationContext(), "Latitude " + lat + "\n Longitude:" + lng, Toast.LENGTH_LONG).show();
 
