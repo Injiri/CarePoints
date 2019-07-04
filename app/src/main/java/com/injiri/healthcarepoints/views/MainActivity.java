@@ -39,6 +39,7 @@ import com.injiri.healthcarepoints.json.GeometryController;
 import com.injiri.healthcarepoints.model.Carepoint;
 import com.injiri.healthcarepoints.services.UserlocationService;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -115,15 +116,14 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
 
             StringBuffer carePointsStringBuffer = HttpRequests.getAllAvailableCarepoints(latitude, longitude);
+            ArrayList<Carepoint> ca = new ArrayList<>();
+
 
             if (carePointsStringBuffer != null) {
-
                 carepoints = GeometryController.deserializeCarepointData(carePointsStringBuffer);
-
                 for (Carepoint carepoint : carepoints) {
-                    Log.e(TAG, "doInBackground: carepoint" + carepoint);
+                    Log.e(TAG, "doInBackground: carepoint detail :" + carepoint.getName());
                 }
-
             } else {
                 Log.e(TAG, "doInBackground: buffer null");
             }

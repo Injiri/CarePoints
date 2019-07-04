@@ -13,26 +13,22 @@ import java.util.ArrayList;
 public class GeometryController {
 
     private static final String TAG = GeometryController.class.getSimpleName();
+    public static ArrayList<Carepoint> carePointArrayList = new ArrayList<Carepoint>();
 
-
-    /**
-     * deserializeCarepointData method to manipulate data through from JSON format
-     *
-     * @param carepointsStringBuffer
-     */
     public static ArrayList<Carepoint> deserializeCarepointData(StringBuffer carepointsStringBuffer) {
 
-        ArrayList<Carepoint> carePointArrayList = new ArrayList();
 
         try {
 
+            carePointArrayList.clear();
             JSONObject jsonpObject = new JSONObject(carepointsStringBuffer.toString());
             JSONArray jsonArray = jsonpObject.getJSONArray("results");
 
-            Carepoint carepoint = new Carepoint();
             for (int index = 0; index < jsonArray.length(); index++) {
+
                 try {
                     JSONObject jsonObject = jsonArray.getJSONObject(index);
+                    Carepoint carepoint = new Carepoint();
 
 
                     if (jsonObject.getString("name") != null) {
@@ -51,18 +47,15 @@ public class GeometryController {
                     carepoint.setGeometry(new double[]{jsonObject.getJSONObject("geometry").getJSONObject("location").getDouble("lat"),
                             jsonObject.getJSONObject("geometry").getJSONObject("location").getDouble("lng")});
 
+                    carePointArrayList.add(carepoint);
 
                 } catch (Exception e) {
                     Log.e(TAG, "deserializeCarepointData: " + e);
                 }
 
-                carePointArrayList.add(carepoint);
             }
 
-            Log.e(TAG, "deserializeCarepointData: Carepoints Arrays List Data " + carePointArrayList);
-
             return carePointArrayList;
-
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "deserializeCarepointData: " + e);
