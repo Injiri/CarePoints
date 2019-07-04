@@ -39,7 +39,6 @@ import com.injiri.healthcarepoints.json.GeometryController;
 import com.injiri.healthcarepoints.model.Carepoint;
 import com.injiri.healthcarepoints.services.UserlocationService;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     RecyclerView carepointsRecyclerView;
-    ArrayList<Carepoint> carepoints;
+    ArrayList<Carepoint> carepointArrayList;
     ProgressBar carepointsrogressBar;
     Button carepointsbtm;
     CarepointAdapter adapter;
@@ -63,14 +62,14 @@ public class MainActivity extends AppCompatActivity {
         carepointsRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         carepointsbtm = (Button) findViewById(R.id.carepoints_btn);
         carepointsrogressBar = (ProgressBar) findViewById(R.id.carepoints_progress_bar);
-        carepoints = new ArrayList<>();
+        carepointArrayList = new ArrayList<>();
 
-        carepoints.add(new Carepoint("Lurambi", "Open now", "+254703474326", new double[7]));
-        adapter = new CarepointAdapter(carepoints, getApplicationContext());
+        // carepointArrayList.add(new Carepoint("Lurambi", "Open now", "+254703474326", new double[7]));
+        adapter = new CarepointAdapter(carepointArrayList, getApplicationContext());
         carepointsRecyclerView.setAdapter(adapter);
         carepointsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        latitude = 0.2844924;
-        longitude = 34.7673467;
+//        latitude = 0.2844924;
+//        longitude = 34.7673467;
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(new BroadcastReceiver() {
             @Override
@@ -80,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
                 if (lat != null && lng != null) {
                     Toast.makeText(getApplicationContext(), "Latitude " + lat + "\n Longitude:" + lng, Toast.LENGTH_LONG).show();
 
-//                    latitude = Double.valueOf(lat);
-//                    longitude = Double.valueOf(lng);
+                    latitude = Double.valueOf(lat);
+                    longitude = Double.valueOf(lng);
 
                 } else {
                     Toast.makeText(getApplicationContext(), "Latitude " + "null" + "\n Longitude:" + lng, Toast.LENGTH_LONG).show();
@@ -116,12 +115,12 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
 
             StringBuffer carePointsStringBuffer = HttpRequests.getAllAvailableCarepoints(latitude, longitude);
-            ArrayList<Carepoint> ca = new ArrayList<>();
-
 
             if (carePointsStringBuffer != null) {
-                carepoints = GeometryController.deserializeCarepointData(carePointsStringBuffer);
-                for (Carepoint carepoint : carepoints) {
+
+                    carepointArrayList.clear();
+                for (Carepoint carepoint : GeometryController.deserializeCarepointData(carePointsStringBuffer)) {
+                    carepointArrayList.add(carepoint);
                     Log.e(TAG, "doInBackground: carepoint detail :" + carepoint.getName());
                 }
             } else {
@@ -135,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
 
             super.onPostExecute(aVoid);
-
             carepointsrogressBar.setVisibility(View.INVISIBLE);
             adapter.notifyDataSetChanged();
 

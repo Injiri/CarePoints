@@ -41,7 +41,7 @@ public class GeometryController {
                             carepoint.setOpeningHours("Opened");
                         else carepoint.setOpeningHours("closed");
                     } catch (Exception e) {
-                        carepoint.setOpeningHours("Not Available");
+                        carepoint.setOpeningHours("  ");
                     }
                     carepoint.setContact(jsonObject.getString("vicinity"));
                     carepoint.setGeometry(new double[]{jsonObject.getJSONObject("geometry").getJSONObject("location").getDouble("lat"),

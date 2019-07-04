@@ -57,7 +57,7 @@ public class CarepointAdapter extends RecyclerView.Adapter<CarepointAdapter.Care
             super(itemView);
 
             hospital = (TextView) itemView.findViewById(R.id.hospital_title);
-            hospitalName = (TextView) itemView.findViewById(R.id.hospital_title);
+            hospitalName = (TextView) itemView.findViewById(R.id.hospital_name);
             isOpenOrClosed = (TextView) itemView.findViewById(R.id.open_or_closed);
             distance = (TextView) itemView.findViewById(R.id.distance);
 

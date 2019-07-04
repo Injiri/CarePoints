@@ -26,7 +26,7 @@ public class HttpRequests {
 
             /** searching for url */
             URL url = new URL(stringBuilder.toString());
-
+            Log.e(TAG, "getAllAvailableCarepoints: url :" +url );
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             InputStream inputStream = connection.getInputStream();
 
