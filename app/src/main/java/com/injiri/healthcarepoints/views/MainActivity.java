@@ -2,6 +2,7 @@ package com.injiri.healthcarepoints.views;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,12 +49,12 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView carepointsRecyclerView;
     ArrayList<Carepoint> carepointArrayList;
     ProgressBar carepointsrogressBar;
+    ProgressDialog progressDialog;
     Button carepointsbtm;
     CarepointAdapter adapter;
     public double latitude;
     public double longitude;
     private boolean userservice_running = false;
-    public static java.lang.StringBuffer stringBuffer = new StringBuffer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             carepointsrogressBar.setVisibility(View.VISIBLE);
-
+            displayProgressDialog("Fetching carepoints");
         }
 
         @Override
@@ -137,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
             super.onPostExecute(aVoid);
             carepointsrogressBar.setVisibility(View.INVISIBLE);
+            progressDialog.dismiss();
             adapter.notifyDataSetChanged();
 
         }
@@ -294,6 +296,15 @@ public class MainActivity extends AppCompatActivity {
         stopService(new Intent(this, UserlocationService.class));
         userservice_running = false;
         super.onDestroy();
+    }
+
+    public void displayProgressDialog(String title){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Loading ...");
+        progressDialog.setMessage(title);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
     }
 
 
