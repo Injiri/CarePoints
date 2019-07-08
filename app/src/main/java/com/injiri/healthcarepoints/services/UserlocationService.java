@@ -44,8 +44,8 @@ public class UserlocationService extends Service implements GoogleApiClient.Conn
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         myLocationClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
-        myLocationRequest.setInterval(150000000);
-        myLocationRequest.setFastestInterval(150000000);
+        myLocationRequest.setInterval(15000);
+        myLocationRequest.setFastestInterval(15000);
         int priority = LocationRequest.PRIORITY_HIGH_ACCURACY;
         myLocationRequest.setPriority(priority);
         myLocationClient.connect();
